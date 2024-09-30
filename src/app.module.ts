@@ -5,6 +5,7 @@ import { ComfortModule } from "./comfort/comfort.module";
 import { RegionModule } from "./region/region.module";
 import { DistrictModule } from "./district/district.module";
 import { CategoriesModule } from "./categories/categories.module";
+import { StadiumsModule } from "./stadiums/stadiums.module";
 
 @Module({
   imports: [
@@ -29,6 +30,8 @@ import { CategoriesModule } from "./categories/categories.module";
     RegionModule,
     DistrictModule,
     CategoriesModule,
+    StadiumsModule,
+    StadiumsModule,
   ],
 })
 export class AppModule {}

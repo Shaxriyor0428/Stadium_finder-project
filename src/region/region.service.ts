@@ -1,26 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRegionDto } from './dto/create-region.dto';
-import { UpdateRegionDto } from './dto/update-region.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateRegionDto } from "./dto/create-region.dto";
+import { UpdateRegionDto } from "./dto/update-region.dto";
+import { InjectModel } from "@nestjs/sequelize";
+import { Region } from "./models/region.model";
 
 @Injectable()
 export class RegionService {
+  constructor(@InjectModel(Region) private regionModel: typeof Region) {}
   create(createRegionDto: CreateRegionDto) {
-    return 'This action adds a new region';
+    return this.regionModel.create(createRegionDto);
   }
 
   findAll() {
-    return `This action returns all region`;
+    return this.regionModel.findAll({ include: { all: true } });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} region`;
+    return this.regionModel.findByPk(id);
   }
 
   update(id: number, updateRegionDto: UpdateRegionDto) {
-    return `This action updates a #${id} region`;
+    return this.regionModel.update(updateRegionDto, { where: { id } });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} region`;
+    return this.regionModel.destroy({ where: { id } });
   }
 }
