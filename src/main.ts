@@ -7,16 +7,18 @@ async function start() {
   try {
     const PORT = process.env.PORT || 3030;
     const app = await NestFactory.create(AppModule);
-
-    app.useGlobalPipes(new ValidationPipe());
-
     app.use(cookieParser());
+    app.useGlobalPipes(new ValidationPipe());
+    app.setGlobalPrefix("api");
+
 
     const config = new DocumentBuilder()
       .setTitle("Stadium Finder")
       .setDescription("My stadium finder project REST API")
       .setVersion("1.0")
-      .addTag("NestJs, validation, swagger, guard, sequelize, testing")
+      .addTag(
+        "NestJs, validation, swagger, guard, sequelize, pg, mailer, bot, sms"
+      )
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
