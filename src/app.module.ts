@@ -24,6 +24,7 @@ import { OrderModule } from "./order/order.module";
 import { Order } from "./order/models/order.model";
 import { AdminModule } from "./admin/admin.module";
 import { Admin } from "./admin/models/admin.model";
+import { Bot } from "./bot/models/bot.model";
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { Admin } from "./admin/models/admin.model";
         UserCard,
         Order,
         Admin,
+        Bot,
       ],
       sync: { alter: true },
       autoLoadModels: true,
