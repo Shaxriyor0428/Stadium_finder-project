@@ -14,5 +14,6 @@ import { MailModule } from "../mail/mail.module";
   ],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [JwtModule],
 })
 export class UsersModule {}

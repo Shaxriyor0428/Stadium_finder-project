@@ -8,6 +8,8 @@ import {
   Delete,
   Res,
   Req,
+  UseGuards,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -16,6 +18,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { User } from "./models/user.model";
 import { Request, Response } from "express";
 import { UserSignInDto } from "./dto/user-signIn.dto";
+import { UserGuard } from "../guards/user.guard";
 
 @ApiTags("Users")
 @Controller("users")
@@ -88,6 +91,7 @@ export class UsersController {
     description: "List of Users",
     type: [User],
   })
+  @UseGuards(UserGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -100,7 +104,7 @@ export class UsersController {
     type: User,
   })
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  findOne(@Param("id", ParseIntPipe) id: string) {
     return this.usersService.findOne(+id);
   }
 
@@ -110,7 +114,10 @@ export class UsersController {
     description: "User updated",
   })
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param("id", ParseIntPipe) id: string,
+    @Body() updateUserDto: UpdateUserDto
+  ) {
     return this.usersService.update(+id, updateUserDto);
   }
 
@@ -120,7 +127,7 @@ export class UsersController {
     description: "User deleted",
   })
   @Delete(":id")
-  remove(@Param("id") id: string) {
+  remove(@Param("id", ParseIntPipe) id: string) {
     return this.usersService.remove(+id);
   }
 }

@@ -90,9 +90,11 @@ export class UsersService {
     const user = await this.userModel.findOne({
       where: { email: userSignInDto.email },
     });
-
     if (!user) {
       throw new UnauthorizedException("Incorrect email or password");
+    }
+    if (!user.is_active) {
+      throw new BadRequestException("User is not active");
     }
     const validPassword = await compare(
       userSignInDto.password,
@@ -106,6 +108,7 @@ export class UsersService {
     const hashed_refresh_token = await hash(refresh_token, 7);
     user.hashed_refresh_token = hashed_refresh_token;
     await user.save();
+
     res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       maxAge: +process.env.REFRESH_TIME_MS,
@@ -162,6 +165,9 @@ export class UsersService {
       const user = await this.userModel.findByPk(decodedToken.id);
       if (!user) {
         throw new NotFoundException("User not found");
+      }
+      if(user.id != decodedToken.id){
+        throw new UnauthorizedException("This ruxsat etilmagan")
       }
 
       const tokens = await this.generateTokens(user);

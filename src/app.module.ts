@@ -17,12 +17,27 @@ import { MailModule } from "./mail/mail.module";
 import { UserCardModule } from "./user_card/user_card.module";
 import { UserWalletModule } from "./user_wallet/user_wallet.module";
 import { UserCard } from "./user_card/models/user_card.model";
+import { BotModule } from "./bot/bot.module";
+import { TelegrafModule } from "nestjs-telegraf";
+import { BOT_NAME } from "./bot/app.constants";
+import { OrderModule } from "./order/order.module";
+import { Order } from "./order/models/order.model";
+import { AdminModule } from "./admin/admin.module";
+import { Admin } from "./admin/models/admin.model";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ".env",
       isGlobal: true,
+    }),
+    TelegrafModule.forRootAsync({
+      botName: BOT_NAME,
+      useFactory: () => ({
+        token: process.env.BOT_TOKEN,
+        include: [BotModule],
+        middlewares: [],
+      }),
     }),
     SequelizeModule.forRoot({
       dialect: "postgres",
@@ -39,6 +54,8 @@ import { UserCard } from "./user_card/models/user_card.model";
         Stadium,
         User,
         UserCard,
+        Order,
+        Admin,
       ],
       sync: { alter: true },
       autoLoadModels: true,
@@ -54,6 +71,9 @@ import { UserCard } from "./user_card/models/user_card.model";
     MailModule,
     UserCardModule,
     UserWalletModule,
+    BotModule,
+    OrderModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
