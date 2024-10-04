@@ -25,6 +25,10 @@ import { Order } from "./order/models/order.model";
 import { AdminModule } from "./admin/admin.module";
 import { Admin } from "./admin/models/admin.model";
 import { Bot } from "./bot/models/bot.model";
+import { Address } from "./bot/models/address.model";
+import { Car } from "./bot/models/user_cars.model";
+import { OtpModule } from "./otp/otp.module";
+import { Otp } from "./otp/models/otp.model";
 
 @Module({
   imports: [
@@ -58,6 +62,9 @@ import { Bot } from "./bot/models/bot.model";
         Order,
         Admin,
         Bot,
+        Address,
+        Car,
+        Otp,
       ],
       sync: { alter: true },
       autoLoadModels: true,
@@ -76,6 +83,7 @@ import { Bot } from "./bot/models/bot.model";
     BotModule,
     OrderModule,
     AdminModule,
+    OtpModule,
   ],
 })
 export class AppModule {}

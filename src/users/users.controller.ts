@@ -10,6 +10,8 @@ import {
   Req,
   UseGuards,
   ParseIntPipe,
+  HttpCode,
+  HttpStatus,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -19,6 +21,8 @@ import { User } from "./models/user.model";
 import { Request, Response } from "express";
 import { UserSignInDto } from "./dto/user-signIn.dto";
 import { UserGuard } from "../guards/user.guard";
+import { PhoneUserDto } from "./dto/phone-user.dto";
+import { VerifyOtpDto } from "./dto/verify-otp.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -36,6 +40,18 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response
   ) {
     return this.usersService.signUp(createUserDto, res);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post("newotp")
+  async newOtp(@Body() phoneUserDto: PhoneUserDto) {
+    return this.usersService.newOtp(phoneUserDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post("verifyotp")
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.usersService.verifyOtp(verifyOtpDto);
   }
 
   @ApiOperation({ summary: "Sign in User" })

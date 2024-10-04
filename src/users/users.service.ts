@@ -15,13 +15,22 @@ import * as uuid from "uuid";
 import { Response, Request } from "express";
 import { UserSignInDto } from "./dto/user-signIn.dto";
 import { MailService } from "../mail/mail.service";
+import { PhoneUserDto } from "./dto/phone-user.dto";
+import * as otpGenerator from "otp-generator";
+import { BotService } from "../bot/bot.service";
+import { Otp } from "../otp/models/otp.model";
+import { AddMinutesToDate } from "../helpers/add_minute";
+import { decode, encode } from "../helpers/crypto";
+import { VerifyOtpDto } from "./dto/verify-otp.dto";
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User) private userModel: typeof User,
+    @InjectModel(Otp) private otpModel: typeof Otp,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    private readonly botService: BotService
   ) {}
   async generateTokens(user: User) {
     const payload = {
@@ -166,8 +175,8 @@ export class UsersService {
       if (!user) {
         throw new NotFoundException("User not found");
       }
-      if(user.id != decodedToken.id){
-        throw new UnauthorizedException("This ruxsat etilmagan")
+      if (user.id != decodedToken.id) {
+        throw new UnauthorizedException("This ruxsat etilmagan");
       }
 
       const tokens = await this.generateTokens(user);
@@ -208,6 +217,85 @@ export class UsersService {
     };
   }
 
+  async newOtp(phoneUserDto: PhoneUserDto) {
+    const phone_number = phoneUserDto.phone;
+    const otp = otpGenerator.generate(4, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    });
+    const isSend = await this.botService.sendOtp(phone_number, otp);
+    if (!isSend) {
+      throw new BadRequestException("Avval botdan ro'yxatdan o'ting");
+    }
+    const now = new Date();
+    const expiration_time = AddMinutesToDate(now, 5);
+    await this.otpModel.destroy({ where: { phone_number } });
+
+    const newOtp = await this.otpModel.create({
+      id: uuid.v4(),
+      otp,
+      expiration_time,
+      phone_number,
+    });
+    const details = {
+      time: now,
+      phone_number,
+      otp_id: newOtp.id,
+    };
+    const ecodedData = await encode(JSON.stringify(details));
+    return {
+      message: "Code telegramga yuborildi",
+      details: ecodedData,
+    };
+  }
+
+  async verifyOtp(verifyOtpDto: VerifyOtpDto) {
+    const { verification_key, otp, phone } = verifyOtpDto;
+    const currentTime = new Date();
+
+    const decodedData = await decode(verification_key);
+    const details = JSON.parse(decodedData);
+
+
+    if (details.phone_number !== phone) {
+      console.log(details.phone_number," ",phone)
+      
+      throw new BadRequestException("OTP has not been sent to this number");
+    }
+    const resultOtp = await this.otpModel.findOne({
+      where: { id: details.otp_id },
+    });
+    if (!resultOtp) {
+      throw new BadRequestException("This otp is not defined");
+    }
+    if (resultOtp.verifyied) {
+      throw new BadRequestException("This Otp already checked");
+    }
+    if (resultOtp.expiration_time < currentTime) {
+      throw new BadRequestException("This otp has expired");
+    }
+    if (resultOtp.otp != otp) {
+      throw new BadRequestException("This otp not match");
+    }
+    const user = await this.userModel.update(
+      {
+        is_owner: true,
+      },
+      { where: { phone: phone }, returning: true }
+    );
+    if (!user[1][0]) {
+      throw new BadRequestException("This user not found");
+    }
+    await this.otpModel.update(
+      { verifyied: true },
+      { where: { id: details.otp_id } }
+    );
+    return {
+      message: "You had been owner",
+      owner: user[1][0].is_owner,
+    };
+  }
   findAll() {
     return this.userModel.findAll({ include: { all: true } });
   }
