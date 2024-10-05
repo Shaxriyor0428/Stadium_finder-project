@@ -1,14 +1,28 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateStadiumDto } from "./dto/create-stadium.dto";
 import { UpdateStadiumDto } from "./dto/update-stadium.dto";
 import { InjectModel } from "@nestjs/sequelize";
 import { Stadium } from "./models/stadium.model";
+import { Comfort } from "../comfort/models/comfort.model";
 
 @Injectable()
 export class StadiumsService {
-  constructor(@InjectModel(Stadium) private stadiumModel: typeof Stadium) {}
-  create(createStadiumDto: CreateStadiumDto) {
-    return this.stadiumModel.create(createStadiumDto);
+  constructor(
+    @InjectModel(Stadium) private stadiumModel: typeof Stadium,
+    @InjectModel(Comfort) private comfortModel: typeof Comfort
+  ) {}
+  async create(createStadiumDto: CreateStadiumDto) {
+    const stadium = await this.stadiumModel.create(createStadiumDto);
+    const comfort = await this.comfortModel.findByPk(
+      createStadiumDto.comfortId
+    );
+    if (!comfort) {
+      throw new BadRequestException("Comfort is not found");
+    }
+
+    await stadium.$set("comforts", [createStadiumDto.comfortId]);
+
+    return stadium;
   }
 
   findAll() {

@@ -7,12 +7,21 @@ import {
   Table,
 } from "sequelize-typescript";
 import { Stadium } from "../../stadiums/models/stadium.model";
-import { Comfort } from "../../comfort/models/comfort.model";
 
-@Table({ tableName: "comfort_stadium", timestamps: false })
-export class ComfortStadium extends Model<ComfortStadium> {
+interface IMediaCreationAtrr {
+  photo: string;
+  description: string;
+}
+@Table({ tableName: "media", timestamps: false })
+export class Media extends Model<Media, IMediaCreationAtrr> {
   @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
   id: number;
+
+  @Column({ type: DataType.STRING })
+  photo: string;
+
+  @Column({ type: DataType.STRING })
+  description: string;
 
   @ForeignKey(() => Stadium)
   @Column({ type: DataType.INTEGER })
@@ -20,11 +29,4 @@ export class ComfortStadium extends Model<ComfortStadium> {
 
   @BelongsTo(() => Stadium)
   stadium: Stadium;
-
-  @ForeignKey(() => Comfort)
-  @Column({ type: DataType.INTEGER })
-  comfortId: number;
-
-  @BelongsTo(() => Comfort)
-  comfort: Comfort;
 }

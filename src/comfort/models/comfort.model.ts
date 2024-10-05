@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from "sequelize-typescript";
+import { Stadium } from "../../stadiums/models/stadium.model";
+import { ComfortStadium } from "./comfort_stadium.model";
 interface IComfortCreationAtrr {
   name: string;
 }
@@ -9,4 +17,8 @@ export class Comfort extends Model<Comfort, IComfortCreationAtrr> {
 
   @Column({ type: DataType.STRING })
   name: string;
+
+  @BelongsToMany(() => Stadium, () => ComfortStadium)
+  stadiums: Stadium[];
+  
 }

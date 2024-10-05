@@ -7,6 +7,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { User } from "../../users/models/user.model";
+import { Stadium } from "../../stadiums/models/stadium.model";
 
 interface IOrderCreationAttr {
   description: string;
@@ -22,10 +23,20 @@ export class Order extends Model<Order, IOrderCreationAttr> {
   @Column({ type: DataType.STRING })
   description: string;
 
+  @Column({ type: DataType.STRING })
+  date: string;
+
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER })
   userId: number;
 
   @BelongsTo(() => User)
   user: User;
+
+  @ForeignKey(() => Stadium)
+  @Column({ type: DataType.INTEGER })
+  stadiumId: number;
+
+  @BelongsTo(() => Stadium)
+  stadium: Stadium;
 }

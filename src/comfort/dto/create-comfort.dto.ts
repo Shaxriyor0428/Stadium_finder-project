@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateComfortDto {
   @ApiProperty({
@@ -9,4 +9,11 @@ export class CreateComfortDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
+  @ApiProperty({
+    example: 1,
+    description: "Unikal stadium id ",
+  })
+  @IsNumber()
+  stadiumId: number;
 }

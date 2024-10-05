@@ -87,4 +87,12 @@ export class CreateStadiumDto {
   @IsNumber()
   @IsNotEmpty()
   categoryId: number;
+
+  @ApiProperty({
+    example: 2,
+    description: "ID of the associated comfort",
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  comfortId: number;
 }

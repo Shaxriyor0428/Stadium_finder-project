@@ -29,6 +29,14 @@ import { Address } from "./bot/models/address.model";
 import { Car } from "./bot/models/user_cars.model";
 import { OtpModule } from "./otp/otp.module";
 import { Otp } from "./otp/models/otp.model";
+import { MediaModule } from "./media/media.module";
+import { Media } from "./media/models/media.model";
+import { StadiumTimesModule } from "./stadium_times/stadium_times.module";
+import { StadiumTime } from "./stadium_times/models/stadium_time.model";
+import { CartModule } from "./cart/cart.module";
+import { Cart } from "./cart/models/cart.model";
+import { UserWallet } from "./user_wallet/models/user_wallet.model";
+import { ComfortStadium } from "./comfort/models/comfort_stadium.model";
 
 @Module({
   imports: [
@@ -65,6 +73,11 @@ import { Otp } from "./otp/models/otp.model";
         Address,
         Car,
         Otp,
+        Media,
+        StadiumTime,
+        Cart,
+        UserWallet,
+        ComfortStadium,
       ],
       sync: { alter: true },
       autoLoadModels: true,
@@ -84,6 +97,9 @@ import { Otp } from "./otp/models/otp.model";
     OrderModule,
     AdminModule,
     OtpModule,
+    MediaModule,
+    StadiumTimesModule,
+    CartModule,
   ],
 })
 export class AppModule {}

@@ -1,13 +1,20 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
 import { Category } from "../../categories/models/category.model";
 import { Region } from "../../region/models/region.model";
+import { Media } from "../../media/models/media.model";
+import { Order } from "../../order/models/order.model";
+import { StadiumTime } from "../../stadium_times/models/stadium_time.model";
+import { Comfort } from "../../comfort/models/comfort.model";
+import { ComfortStadium } from "../../comfort/models/comfort_stadium.model";
 
 interface IStadiumCreationAttr {
   contact_with: string;
@@ -59,4 +66,16 @@ export class Stadium extends Model<Stadium, IStadiumCreationAttr> {
 
   @BelongsTo(() => Region)
   region: Region;
+
+  @HasMany(() => Media)
+  medias: Media[];
+
+  @HasMany(() => Order)
+  orders: Order[];
+
+  @HasMany(() => StadiumTime)
+  stadium_times: StadiumTime[];
+
+  @BelongsToMany(() => Comfort, () => ComfortStadium)
+  comforts: Comfort[];
 }
