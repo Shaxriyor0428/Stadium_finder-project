@@ -259,9 +259,16 @@ export class BotService {
         } else {
           const searchLatitude: number = ctx.message.location.latitude;
           const searchLongitude: number = ctx.message.location.longitude;
-          
+          const userLatitude = Number(address.location.split(",")[0]);
+          const userLongtitude = Number(address.location.split(",")[1]);
 
-          
+          const result = this.haversine(
+            userLatitude,
+            userLongtitude,
+            searchLatitude,
+            searchLongitude
+          );
+          ctx.reply(`Oradagi masofa ${result.toFixed(2)} - km`);
         }
       }
     }
@@ -403,5 +410,26 @@ export class BotService {
       "Verify OTP code: " + OTP
     );
     return true;
+  }
+  haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371;
+
+    const toRadians = (degree: number): number => degree * (Math.PI / 180);
+    const lat1Rad = toRadians(lat1);
+    const lat2Rad = toRadians(lat2);
+    const deltaLat = toRadians(lat2 - lat1);
+    const deltaLon = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+      Math.cos(lat1Rad) *
+        Math.cos(lat2Rad) *
+        Math.sin(deltaLon / 2) *
+        Math.sin(deltaLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = R * c;
+
+    return distance;
   }
 }
