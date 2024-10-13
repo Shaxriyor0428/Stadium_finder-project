@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -22,6 +23,7 @@ import { Otp } from "../otp/models/otp.model";
 import { AddMinutesToDate } from "../helpers/add_minute";
 import { decode, encode } from "../helpers/crypto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
+import { SmsService } from "../sms/sms.service";
 
 @Injectable()
 export class UsersService {
@@ -30,7 +32,8 @@ export class UsersService {
     @InjectModel(Otp) private otpModel: typeof Otp,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-    private readonly botService: BotService
+    private readonly botService: BotService,
+    private readonly smsService: SmsService
   ) {}
   async generateTokens(user: User) {
     const payload = {
@@ -224,7 +227,26 @@ export class UsersService {
       lowerCaseAlphabets: false,
       specialChars: false,
     });
+
+    //BOT
     const isSend = await this.botService.sendOtp(phone_number, otp);
+
+    //SMS
+    // const response = await this.smsService.sendSms(phone_number, otp);
+
+    //get Sms;
+    // const response = await this.smsService.getToken();
+    // console.log(response);
+    //refreshToken
+    const response = await this.smsService.refreshToken();
+    console.log(response,"nega");
+
+    // if (response.status !== 200) {
+    //   throw new ServiceUnavailableException("Otp yuborishda xatolik");
+    // }
+    const message =`OTP code has been sent to ****` +
+      phone_number.slice(phone_number.length - 4);
+
     if (!isSend) {
       throw new BadRequestException("Avval botdan ro'yxatdan o'ting");
     }
@@ -247,6 +269,7 @@ export class UsersService {
     return {
       message: "Code telegramga yuborildi",
       details: ecodedData,
+      sms: message,
     };
   }
 
@@ -257,10 +280,9 @@ export class UsersService {
     const decodedData = await decode(verification_key);
     const details = JSON.parse(decodedData);
 
-
     if (details.phone_number !== phone) {
-      console.log(details.phone_number," ",phone)
-      
+      console.log(details.phone_number, " ", phone);
+
       throw new BadRequestException("OTP has not been sent to this number");
     }
     const resultOtp = await this.otpModel.findOne({

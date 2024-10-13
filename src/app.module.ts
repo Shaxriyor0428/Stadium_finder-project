@@ -37,6 +37,7 @@ import { CartModule } from "./cart/cart.module";
 import { Cart } from "./cart/models/cart.model";
 import { UserWallet } from "./user_wallet/models/user_wallet.model";
 import { ComfortStadium } from "./comfort/models/comfort_stadium.model";
+import { SmsModule } from './sms/sms.module';
 
 @Module({
   imports: [
@@ -100,6 +101,7 @@ import { ComfortStadium } from "./comfort/models/comfort_stadium.model";
     MediaModule,
     StadiumTimesModule,
     CartModule,
+    SmsModule,
   ],
 })
 export class AppModule {}

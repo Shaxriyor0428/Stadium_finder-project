@@ -6,7 +6,6 @@ import { BOT_NAME } from "./app.constants";
 import { Context, Telegraf } from "telegraf";
 import { Markup } from "telegraf";
 import { Address } from "./models/address.model";
-import { repl } from "@nestjs/core";
 import { Car } from "./models/user_cars.model";
 
 @Injectable()
@@ -17,6 +16,7 @@ export class BotService {
     @InjectModel(Car) private carModel: typeof Car,
     @InjectBot(BOT_NAME) private bot: Telegraf<Context>
   ) {}
+
   async start(ctx: Context) {
     const userId = ctx.from.id;
     const user = await this.botModel.findByPk(userId);
